@@ -13,6 +13,7 @@ import type { Note } from '../../types/note';
 import NoteList from '../NoteList/NoteList';
 
 import css from './App.module.css';
+import NoteForm from '../NoteForm/NoteForm';
 
 export default function App() {
   const [search, setSearch] = useState('');
@@ -51,9 +52,10 @@ export default function App() {
             onPageChange={setCurrentPage}
           />
         )}
-        {/* Кнопка створення нотатки */}
+        <button className={css.button}>Create note +</button>
       </header>
       {isSuccess && <NoteList notes={data.notes} />}
+      <NoteForm />
     </div>
   );
 
