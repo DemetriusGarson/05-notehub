@@ -1,76 +1,100 @@
 import toast, { Toaster } from 'react-hot-toast';
-import { fetchMovies } from '../../services/movieService';
-import SearchBar from '../SearchBar/SearchBar';
-import MovieGrid from '../MovieGrid/MovieGrid';
+// import SearchBar from '../SearchBar/SearchBar';
+// import MovieGrid from '../MovieGrid/MovieGrid';
 import { useEffect, useState } from 'react';
-import type { Movie } from '../../types/movie';
-import Loader from '../Loader/Loader';
-import ErrorMessage from '../ErrorMessage/ErrorMessage';
-import MovieModal from '../MovieModal/MovieModal';
+
+// import Loader from '../Loader/Loader';
+// import ErrorMessage from '../ErrorMessage/ErrorMessage';
+// import MovieModal from '../MovieModal/MovieModal';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import Pagination from '../Pagination/Pagination';
+import { fetchNotes } from '../../services/notesService';
+import type { Note } from '../../types/note';
+import NoteList from '../NoteList/NoteList';
 
-// import css from './App.module.css';
+import css from './App.module.css';
 
 export default function App() {
-  const [query, setQuery] = useState('');
+  const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [modalMovie, setModalMovie] = useState<Movie | null>(null);
+  const [modalMovie, setModalMovie] = useState<Note | null>(null);
 
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ['movies', query, currentPage],
+    queryKey: ['notes', currentPage],
 
-    queryFn: () => fetchMovies(query, currentPage),
+    queryFn: () => fetchNotes(currentPage, search),
 
-    enabled: query !== '',
+    // enabled: search !== '',
     placeholderData: keepPreviousData,
   });
 
   useEffect(() => {
-    if (isSuccess && data?.results.length === 0) {
-      const notify = () => toast('No movies found for your request.');
+    if (isSuccess && data?.notes.length === 0) {
+      const notify = () => toast('No notes found for your request.');
       notify();
     }
   }, [isSuccess, data]);
 
-  const totalPages = data?.total_pages ?? 0;
-
-  const handleSearch = async (query: string) => {
-    setQuery(query);
-    setCurrentPage(1);
+  const handleClick = () => {
+    fetchNotes(currentPage, search);
   };
 
-  const openModal = (selectedMovie: Movie) => {
-    setModalMovie(selectedMovie);
-  };
-
-  const closeModal = () => {
-    setModalMovie(null);
-  };
-
+  const totalPages = data?.totalPages ?? 0;
   return (
-    <>
-      <div>
-        <Toaster />
-      </div>
-
-      <SearchBar onSubmit={handleSearch} />
-
-      {isSuccess && totalPages > 1 && (
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-        />
-      )}
-
-      {isLoading && <Loader />}
-      {isError && <ErrorMessage />}
-
-      {isSuccess && data.results.length > 0 && (
-        <MovieGrid movies={data?.results} onSelect={openModal} />
-      )}
-      {modalMovie && <MovieModal movie={modalMovie!} onClose={closeModal} />}
-    </>
+    <div className={css.app}>
+      <header className={css.toolbar}>
+        {/* Компонент SearchBox */}
+        {isSuccess && totalPages > 1 && (
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+          />
+        )}
+        {/* Кнопка створення нотатки */}
+      </header>
+      {isSuccess && <NoteList notes={data.notes} />}
+    </div>
   );
+
+  // const totalPages = data?.total_pages ?? 0;
+
+  // const handleSearch = async (query: string) => {
+  //   setQuery(query);
+  //   setCurrentPage(1);
+  // };
+
+  // const openModal = (selectedMovie: Movie) => {
+  //   setModalMovie(selectedMovie);
+  // };
+
+  // const closeModal = () => {
+  //   setModalMovie(null);
+  // };
+
+  // return (
+  //   <>
+  //     <div>
+  //       <Toaster />
+  //     </div>
+
+  //     <SearchBar onSubmit={handleSearch} />
+
+  //     {isSuccess && totalPages > 1 && (
+  //       <Pagination
+  //         totalPages={totalPages}
+  //         currentPage={currentPage}
+  //         onPageChange={setCurrentPage}
+  //       />
+  //     )}
+
+  //     {isLoading && <Loader />}
+  //     {isError && <ErrorMessage />}
+
+  //     {isSuccess && data.results.length > 0 && (
+  //       <MovieGrid movies={data?.results} onSelect={openModal} />
+  //     )}
+  //     {modalMovie && <MovieModal movie={modalMovie!} onClose={closeModal} />}
+  //   </>
+  // );
 }
