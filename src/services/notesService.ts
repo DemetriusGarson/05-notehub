@@ -22,7 +22,7 @@ export async function fetchNotes(page: number, userInput: string): Promise<Notes
             perPage: 12
         },
     })
-    console.log(response.data)
+    // console.log(response.data)
     return response.data
 
 }
@@ -30,7 +30,7 @@ export async function fetchNotes(page: number, userInput: string): Promise<Notes
 export async function postNote(note: NoteToPost): Promise<Note> {
 
     const response = await notehubApi.post<Note>("/notes", note)
-    console.log(response.data);
+    // console.log(response.data);
     return response.data;
 }
 

@@ -39,7 +39,7 @@ export default function App() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
-      const notify = () => toast('Post created');
+      const notify = () => toast('Note created');
       notify();
     },
   });
@@ -50,7 +50,7 @@ export default function App() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
-      const notify = () => toast('Post deleted');
+      const notify = () => toast('Note deleted');
       notify();
     },
   });
