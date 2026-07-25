@@ -20,6 +20,11 @@ export default function NoteList({ notes }: NoteListProps) {
       const notify = () => toast('Note deleted');
       notify();
     },
+    onError: error => {
+      const notify = () => toast(`Delete false with error  : ${error}`);
+      notify();
+      console.log(error);
+    },
   });
 
   return (

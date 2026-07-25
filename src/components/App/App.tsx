@@ -45,7 +45,7 @@ export default function App() {
         <Toaster
           toastOptions={{
             className: '',
-            duration: 1000,
+            duration: 2000,
             removeDelay: 1000,
             style: {
               background: '#363636',

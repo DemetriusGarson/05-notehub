@@ -47,6 +47,12 @@ export default function NoteForm({ onClose }: NoteFormProps) {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
       const notify = () => toast('Note created');
       notify();
+      onClose();
+    },
+    onError: error => {
+      const notify = () => toast(`Create false with error  : ${error}`);
+      notify();
+      console.log(error);
     },
   });
 
@@ -56,7 +62,6 @@ export default function NoteForm({ onClose }: NoteFormProps) {
   ) => {
     postMutation.mutate(values);
     actions.resetForm();
-    onClose();
   };
   return (
     <Formik
