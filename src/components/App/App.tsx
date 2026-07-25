@@ -1,23 +1,17 @@
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import { useState } from 'react';
 
 import Loader from '../Loader/Loader';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
-import {
-  keepPreviousData,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import Pagination from '../Pagination/Pagination';
-import { deleteNote, fetchNotes, postNote } from '../../services/notesService';
+import { fetchNotes } from '../../services/noteService';
 import NoteList from '../NoteList/NoteList';
 import css from './App.module.css';
 import NoteForm from '../NoteForm/NoteForm';
 import { useDebouncedCallback } from 'use-debounce';
 import SearchBox from '../SearchBox/SearchBox';
 import Modal from '../Modal/Modal';
-import type { NoteToPost } from '../../types/note';
 
 export default function App() {
   const [search, setSearch] = useState('');
@@ -31,41 +25,10 @@ export default function App() {
     placeholderData: keepPreviousData,
   });
 
-  const queryClient = useQueryClient();
-
-  const postMutation = useMutation({
-    mutationFn: async (note: NoteToPost) => {
-      await postNote(note);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-      const notify = () => toast('Note created');
-      notify();
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await deleteNote(id);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-      const notify = () => toast('Note deleted');
-      notify();
-    },
-  });
-
   const handleSearch = useDebouncedCallback(searchText => {
     setSearch(searchText);
+    setCurrentPage(1);
   }, 500);
-
-  const handleCreate = (note: NoteToPost) => {
-    postMutation.mutate(note);
-  };
-
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id);
-  };
 
   const openModal = () => {
     setIsModal(true);
@@ -106,15 +69,14 @@ export default function App() {
       </header>
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
-      {isSuccess && data.notes.length > 0 && (
-        <NoteList onDelete={handleDelete} notes={data.notes} />
-      )}
+      {isSuccess && data.notes.length > 0 && <NoteList notes={data.notes} />}
       {isSuccess && data.notes.length === 0 && (
         <p className={css.text_no_results}>Not found posts for your search</p>
       )}
       {isModal && (
         <Modal
-          children={<NoteForm onCreate={handleCreate} onClose={closeModal} />}
+          onClose={closeModal}
+          children={<NoteForm onClose={closeModal} />}
         />
       )}
     </div>
