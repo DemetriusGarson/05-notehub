@@ -1,15 +1,21 @@
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { ErrorMessage, Field, Form, Formik, type FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import css from './NoteForm.module.css';
 import { useId } from 'react';
+import type { NoteToPost } from '../../types/note';
 
-interface NoteForm {
+interface NoteFormProps {
+  onClose: () => void;
+  onCreate: (note: NoteToPost) => void;
+}
+
+interface NoteFormValues {
   title: string;
   content: string;
   tag: 'Todo' | 'Work' | 'Personal' | 'Meeting' | 'Shopping';
 }
 
-const initialValues: NoteForm = {
+const initialValues: NoteFormValues = {
   title: '',
   content: '',
   tag: 'Todo',
@@ -26,13 +32,20 @@ const Schema = Yup.object().shape({
     .required('Tag is required'),
 });
 
-export default function NoteForm() {
+export default function NoteForm({ onClose, onCreate }: NoteFormProps) {
   const formId = useId();
 
-  const handleSubmit = () => {};
+  const handleSubmit = (
+    values: NoteFormValues,
+    actions: FormikHelpers<NoteFormValues>
+  ) => {
+    onCreate(values);
+    actions.resetForm();
+    onClose();
+  }; //!!!!!!!!!!!!!!!
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={initialValues} //!!!!!!!!!!!!
       validationSchema={Schema}
       onSubmit={handleSubmit}
     >
@@ -78,7 +91,7 @@ export default function NoteForm() {
         </div>
 
         <div className={css.actions}>
-          <button type="button" className={css.cancelButton}>
+          <button onClick={onClose} type="button" className={css.cancelButton}>
             Cancel
           </button>
           <button type="submit" className={css.submitButton} disabled={false}>
